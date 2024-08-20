@@ -46,6 +46,9 @@ class CourseController extends Controller
             $courses = $courses->forPage(1);
         }
         $courses = $courses->paginate(2);
+        if($courses->isEmpty() && ($courses->currentPage() - 1) > 0) {
+            return redirect()->route("courses", [ 'page' => $courses->currentPage() - 1, 'q' => request()->q ]);
+        }
         return view("Course.index", compact("courses"));
     }
     public function create() {

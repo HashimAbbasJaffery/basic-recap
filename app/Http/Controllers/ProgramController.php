@@ -10,6 +10,9 @@ class ProgramController extends Controller
     public function index(Request $request) {
         $keyword = $request->get("q");
         $programs = Program::where("program_name", "LIKE", "%$keyword%")->paginate(2);
+        if($programs->isEmpty() && ($programs->currentPage() - 1) > 0) {
+            return redirect()->route("programs", [ 'page' => $programs->currentPage() - 1, 'q' => request()->q ]);
+        }
         return view("Program.index", compact("programs"));
     }
     public function create() {

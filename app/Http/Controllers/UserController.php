@@ -11,6 +11,9 @@ class UserController extends Controller
     public function index() {
         $keyword = request()->q;
         $students = User::where("name", "LIKE", "%$keyword%")->where("role", "student")->paginate(2);
+        if($students->isEmpty() && ($students->currentPage() - 1) > 0) {
+            return redirect()->route("students", [ 'page' => $students->currentPage() - 1, 'q' => request()->q ]);
+        }
         return view("Students.index", compact("students"));
     }
 
