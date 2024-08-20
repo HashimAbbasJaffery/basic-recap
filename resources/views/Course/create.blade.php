@@ -1,15 +1,21 @@
 <x-layout>
-    <div class="container w-75 mx-auto">
-        <form action="{{ route('createCourse') }}" style="text-align: center;" method="POST" name="formAdd">
+    <div class="container w-75">
+        <form action="{{ route('createCourse') }}"  method="POST" name="formAdd">
             @csrf
-            <p class="mb-1">Course: </p>
-            <input type="text" value="{{ old('course') }}" name="course">
-            @error("course")
-                <p>{{ $message }}</p>
-            @enderror
+            
+            <label for="course" class="w-100 mb-1">
+                <h2 style="font-size: 20px;">Course</h2>
+                @error("course")
+                    <p class="mb-1 text-danger" style="font-size: 12px;">{{ $message }}</p>
+                @enderror
+                <input type="text" value="{{ old('course') }}" class="@error('course') border border-danger @enderror form-control w-50" id="name" name="course" value="{{ old('name') }}">
+            </label>
             <br>
             <div>
-                <div class="program-selector mx-auto search-course border w-50 p-2 mt-3" style="height: 250px; overflow: auto;">
+                <div class="program-selector search-course border w-50 p-2 mt-3" style="height: 250px; overflow: auto;">
+                    @error("program")
+                        <p class="mb-1 text-danger" style="font-size: 12px;">{{ $message }}</p>
+                    @enderror
                     <input type="text" class="search_program w-100 border outline-none px-2" placeholder="Search Course">
                     <ul class="courseList p-0 mt-2">
                         @foreach($programs as $program)
@@ -21,12 +27,9 @@
                     </ul>
                 </div>
                 
-                @error("program")
-                    <p>{{ $message }}</p>
-                @enderror
                 <input type="hidden" value="{{ old('program') }}" name="program" class="program_field">
             
-            <input class="mt-2" type="submit">
+            <input class="mt-2 form-control btn btn-primary" type="submit">
         </div>
         </form>
     </div>

@@ -69,7 +69,7 @@ deleteButton.forEach(del => {
         axios.delete(`/student/${id}/delete`)
             .then(res => {
                 
-                window.location = "/?page={{ request()->page }}";
+                window.location = "/?page={{ request()->page }}&q={{ request()->q }}";
             })
             .catch(err => {
                 console.log(err)
@@ -88,7 +88,7 @@ status.forEach(statusButton => {
         axios.put(`/student/${statusButton.dataset.id}/changeStatus`)
             .then(res => {
                 
-                window.location = "/?page={{ request()->page }}";
+                window.location = "/?page={{ request()->page }}&q={{ request()->q }}";
 
             })
             .catch(err => {

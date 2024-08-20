@@ -38,14 +38,14 @@ option {
         </div>
 
 
-        <p style="font-size: 20px;" class="mb-0 mt-3">Add Course</p>
-        <div class="search-course border w-50 p-2 mt-3" style="height: 250px; overflow: auto;">
+        <div class="search-course border w-50 p-2 mt-3 mb-3" style="height: 250px; overflow: auto;">
+            <p style="font-size: 20px;" class="mb-3 mt-3">Add Course</p>
             <input type="text" class="search_course w-100 border outline-none px-2" placeholder="Search Course">
             <ul class="courseList p-0 mt-2">
                 @foreach($courses as $course)
                     <li style="list-style: none;" class="border p-2 d-flex align-items-center justify-content-between">
                         {{ $course->course }}
-                        <button class="btn btn-primary" onclick="assign('{{ $course->id }}')">Assign</button>
+                        <button class="btn btn-primary" @disabled($user->courses()?->find($course->id)?->exists() ?? false) onclick="assign('{{ $course->id }}')">{{ !$user->courses()?->find($course->id)?->exists() ? "Assign" : "Assigned" }}</button>
                     </li>
                 @endforeach
             </ul>
@@ -56,6 +56,16 @@ option {
         const unassign = document.querySelector(".unassign");
 
         const deallocate = (user, course) => {
+
+            Swal.fire({
+            title: "Are you sure you want to deallocate the course?",
+            showCancelButton: true,
+            confirmButtonText: "Deallocate",
+            denyButtonText: `Cancel`
+            }).then((result) => {
+            /* Read more about isConfirmed, isDenied below */
+            if (result.isConfirmed) {
+                
             axios.post(`/course/${user}/remove`, { course: course })
                 .then(res => {
                     console.log(res);
@@ -64,6 +74,10 @@ option {
                 .catch(err => {
                     console.log(err)
                 })
+            } else if (result.isDenied) {
+                Swal.fire("Changes are not saved", "", "info");
+            }
+            });
         }
 
 
@@ -90,7 +104,8 @@ option {
         const courses = JSON.parse(`@json($courses)`);
         let modifiedCourses = [];
         const courseList = document.querySelector(".courseList");
-        
+        let assignedCourse = JSON.parse(`@json($user->courses)`);
+     
         const searchCourse = () => {
 
             const search = document.querySelector(".search_course");
@@ -100,7 +115,7 @@ option {
             
             courseList.innerHTML = "";
             modifiedCourses.forEach(course => {
-                courseList.innerHTML += `<li style="list-style: none;" class="border p-2 d-flex align-items-center justify-content-between">${course.course} <button class="btn btn-primary" onclick="assign(${course.id})">Assign</button></li>`
+                courseList.innerHTML += `<li style="list-style: none;" class="border p-2 d-flex align-items-center justify-content-between">${course.course} <button ${ assignedCourse.filter(crs => crs.id === course.id).length > 0 ? 'disabled' : '' } class="btn btn-primary" onclick="assign(${course.id})">${ assignedCourse.filter(crs => crs.id === course.id).length > 0 ? 'Assigned' : 'Assign' }</button></li>`
             })
         }
         search.addEventListener("input", searchCourse)

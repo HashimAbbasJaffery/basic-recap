@@ -4,7 +4,6 @@
         <a href="/program/create" class="btn btn-light mb-3">Create Program</a>
         <form class="search" action="{{ route('programs') }}"  method="GET">
             <input type="text" name="q" style="height: 32px;" value="{{ request()->q }}">
-            <input type="hidden" name="page" value="{{ request()->page }}">
             <input type="submit" value="Search">
         </form>
     </div>
@@ -61,10 +60,10 @@ deleteButton.forEach(del => {
             
         axios.delete(`/program/${id}/delete`)
             .then(res => {
-                window.location = `/programs?page={{request()->page}}`
+                window.location = `/programs?page={{request()->page}}&q={{ request()->q }}`
             })
             .catch(err => {
-                window.location = `/programs?page={{request()->page}}`
+                window.location = `/programs?page={{request()->page}}&q={{ request()->q }}`
             })
         } else if (result.isDenied) {
         }

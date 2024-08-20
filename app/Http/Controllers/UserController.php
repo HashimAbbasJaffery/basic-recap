@@ -51,7 +51,6 @@ class UserController extends Controller
             "email" => ["required", "email", "unique:users"],
             "password" => "required"
         ]);
-
         User::create([...$request->all(), "role" => "student"]);
 
         return redirect()->to("/");

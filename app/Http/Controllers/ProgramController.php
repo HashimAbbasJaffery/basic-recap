@@ -9,8 +9,7 @@ class ProgramController extends Controller
 {
     public function index(Request $request) {
         $keyword = $request->get("q");
-        $page = $request->get("page");
-        $programs = Program::where("program_name", "LIKE", "%$keyword%")->paginate(2, ['*'], 'page', $page);
+        $programs = Program::where("program_name", "LIKE", "%$keyword%")->paginate(2);
         return view("Program.index", compact("programs"));
     }
     public function create() {

@@ -41,7 +41,11 @@ class CourseController extends Controller
 
     public function index(Request $request) {
         $keyword = $request->q;
-        $courses = Course::where("course", "LIKE", "%" .$keyword . "%")->paginate(2);
+        $courses = Course::where("course", "LIKE", "%" . $keyword . "%");
+        if($keyword) {
+            $courses = $courses->forPage(1);
+        }
+        $courses = $courses->paginate(2);
         return view("Course.index", compact("courses"));
     }
     public function create() {
@@ -53,7 +57,6 @@ class CourseController extends Controller
             "course" => [ "required" ],
             "program" => [ "required" ]
         ]);
-
         $program = Program::find($request->program);
         $program->courses()->create($request->except("_token"));
         // Course::create($request->except("_token"));
