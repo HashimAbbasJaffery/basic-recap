@@ -1,25 +1,109 @@
 <x-layout>
+    <style>
+     datalist {
+  position: absolute;
+  background-color: white;
+  border: 1px solid blue;
+  border-radius: 0 0 5px 5px;
+  border-top: none;
+  font-family: sans-serif;
+  width: 350px;
+  padding: 5px;
+
+}
+
+option {
+  background-color: white;
+  padding: 4px;
+  color: blue;
+  margin-bottom: 1px;
+   font-size: 18px;
+  cursor: pointer;
+}
+    </style>
     <div class="information w-75 mt-3 mx-auto">
-        <p style="font-size: 20px;">Name: {{ $user->name }}</p>
-        <p style="font-size: 20px;" class="mb-1">Courses Enrolled: </p>
+        <p style="font-size: 20px;" class="mb-1">Name: {{ $user->name }}</p>
+        <p style="font-size: 20px;" class="mb-1">Email: {{ $user->email }}</p>
+        <p style="font-size: 20px">Status: {{ !$user->status ? "Active" : "Deactive" }}</p>
+        <p style="font-size: 20px;" class="mb-1 mt-3">Courses Enrolled: </p>
         <div class="courses mt-2">
-            @foreach($user->courses as $course)
-                <a href="#" class="d-block" style="font-size: 20px;">{{ $course->course }}</a>
-            @endforeach
+            @forelse($user->courses as $course)
+                <div class="d-block border rounded px-2 py-2 m-1 d-flex justify-content-between align-items-center" style="font-size: 20px;">
+                    <div>{{ $course->course }}</div>
+                    <button data-id="{{ $course->id }}" onclick="deallocate('{{ $user->id }}', '{{ $course->id }}')" class="unassign btn btn-danger">Unassign</button>
+                </div>
+            @empty 
+                <div class="alert alert-danger">Not Enrolled in any course yet!</div>
+            @endforelse
         </div>
 
-        <div class="enroll mt-2">
-            <form action="/course/{{ $user->id }}/add" method="POST">
-                @csrf 
-                <p style="font-size: 20px;">Enroll New Course: </p>
-                <select name="course">
-                    @foreach($courses as $course)
-                        <option value="{{ $course->id }}">{{ $course->course }}</option>
-                    @endforeach
-                </select>
-                <button type="submit">Add Course</button>
-            </form>
+
+        <p style="font-size: 20px;" class="mb-0 mt-3">Add Course</p>
+        <div class="search-course border w-50 p-2 mt-3" style="height: 250px; overflow: auto;">
+            <input type="text" class="search_course w-100 border outline-none px-2" placeholder="Search Course">
+            <ul class="courseList p-0 mt-2">
+                @foreach($courses as $course)
+                    <li style="list-style: none;" class="border p-2 d-flex align-items-center justify-content-between">
+                        {{ $course->course }}
+                        <button class="btn btn-primary" onclick="assign('{{ $course->id }}')">Assign</button>
+                    </li>
+                @endforeach
+            </ul>
         </div>
         
     </div>
+    <script>
+        const unassign = document.querySelector(".unassign");
+
+        const deallocate = (user, course) => {
+            axios.post(`/course/${user}/remove`, { course: course })
+                .then(res => {
+                    console.log(res);
+                    window.location.reload();
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+
+
+        const search = document.querySelector(".search_course");
+        const assign = course => {
+            axios.post("/course/{{ $user->id }}/add", { course })
+                .then(res => {
+                    if(res.data)
+                        window.location.reload();
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+
+        function debounce(func, timeout = 300){
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
+
+        const courses = JSON.parse(`@json($courses)`);
+        let modifiedCourses = [];
+        const courseList = document.querySelector(".courseList");
+        
+        const searchCourse = () => {
+
+            const search = document.querySelector(".search_course");
+            console.log(courses);
+            modifiedCourses = courses.filter(course => course.course.toLowerCase().includes(search.value.toLowerCase()));
+            console.log(modifiedCourses);
+            
+            courseList.innerHTML = "";
+            modifiedCourses.forEach(course => {
+                courseList.innerHTML += `<li style="list-style: none;" class="border p-2 d-flex align-items-center justify-content-between">${course.course} <button class="btn btn-primary" onclick="assign(${course.id})">Assign</button></li>`
+            })
+        }
+        search.addEventListener("input", searchCourse)
+    </script>
+
 </x-layout>

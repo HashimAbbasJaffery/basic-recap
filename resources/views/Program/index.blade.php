@@ -1,39 +1,42 @@
 <x-layout>
-<div class="container w-50 mt-4">
+<div class="container w-75 mt-4">
     <div class="search-course d-flex justify-content-between align-items-center">
-        <a href="/course/create" class="btn btn-light mb-3">Create Course</a>
-        <form class="search" action="{{ route('courses') }}"  method="GET">
+        <a href="/program/create" class="btn btn-light mb-3">Create Program</a>
+        <form class="search" action="{{ route('programs') }}"  method="GET">
             <input type="text" name="q" style="height: 32px;" value="{{ request()->q }}">
+            <input type="hidden" name="page" value="{{ request()->page }}">
             <input type="submit" value="Search">
         </form>
     </div>
-    @if($courses->count())
+    @if($programs->count())
     <table class="table">
     <thead>
         <tr>
-        <th scope="col">Course</th>
         <th scope="col">Program</th>
+        <th scope="col">Description</th>
+        <th scope="col">Total Courses</th>
         <th scope="col">Actions</th>
         </tr>
     </thead>
     <tbody>
-        @foreach($courses as $course)
+        @foreach($programs as $program)
         <tr>
-            <td>{{ $course->course }}</td>
-            <td>{{ $course->program->program_name }}</td>
-            <td class="flex">
-                <a href="{{ route('updateCourse', [ 'course' => $course->id ]) }}" type="submit" class="btn btn-primary">Update</a>
-                <button class="delete btn btn-danger" data-id="{{ $course->id }}">Delete</button>
+            <td>{{ $program->program_name }}</td>
+            <td>{{ substr($program->description, 0, 60) }} {{ strlen($program->description) > 60 ? "..." : "" }}</td>
+            <td>{{ $program->courses()->count() }}</td>
+            <td class="flex text-center">
+                <a href="{{ route('program.update', [ 'program' => $program->id ]) }}" type="submit" class="btn btn-primary">Update</a>
+                <button class="delete btn btn-danger" data-id="{{ $program->id }}">Delete</button>
             </td>
         </tr>
         @endforeach
 
     </tbody>
+    @else 
+    <div class="alert alert-danger">No Programs Found!</div>
+    @endif
 </table>
-@else
-    <div class="alert alert-danger">No Course Found!</div>
-@endif
-{{ $courses->appends(request()->query())->links() }}
+{{ $programs->appends(request()->query())->links() }}
 </div>
 
 <script>
@@ -45,6 +48,8 @@ const deleteButton = document.querySelectorAll(".delete");
 deleteButton.forEach(del => {
     del.addEventListener("click", function() {
         const id = del.dataset.id;
+
+
         Swal.fire({
         title: "Are you sure? You want to delete it?",
         showDenyButton: true,
@@ -54,17 +59,14 @@ deleteButton.forEach(del => {
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
             
-        axios.delete(`/course/${id}/delete`)
+        axios.delete(`/program/${id}/delete`)
             .then(res => {
-                window.location = "/courses/?page={{ request()->page }}"
+                window.location = `/programs?page={{request()->page}}`
             })
             .catch(err => {
-                
-                window.location = "/courses/?page={{ request()->page }}"
+                window.location = `/programs?page={{request()->page}}`
             })
-
         } else if (result.isDenied) {
-
         }
         });
     })

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Program;
+
 
 class Course extends Model
 {
@@ -11,5 +13,8 @@ class Course extends Model
     protected $guarded = ["id", "created_at", "updated_at"];
     public function users() {
         return $this->belongsToMany(User::class);
+    }
+    public function program() {
+        return $this->belongsTo(Program::class);
     }
 }

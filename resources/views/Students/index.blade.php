@@ -1,5 +1,5 @@
 <x-layout>
-<div class="container w-50 mt-4">
+<div class="container w-75 mt-4">
     
     <div class="search-course d-flex justify-content-between align-items-center">
         <a href="/student/add" class="btn btn-light mb-3">Create Student</a>
@@ -8,6 +8,7 @@
             <input type="submit" value="Search">
         </form>
     </div>
+    @if($students->count())
     <table class="table">
     <thead>
         <tr>
@@ -32,15 +33,18 @@
             <td>{{ $courses ? $courses : "Not enrolled yet!" }}</td>
             <td class="flex">
                 <button class="delete btn btn-danger" data-id="{{ $student->id }}">Delete</button>
-                <!-- <a href="/student/{{ $student->id }}" class="btn btn-primary" data-id="{{ $student->id }}">More Information</a> -->
+                <a href="/student/{{ $student->id }}" class="btn btn-primary" data-id="{{ $student->id }}">More Information</a>
                 <a href="{{ route('updateUser', [ 'user' => $student->id ]) }}" class="btn btn-primary" data-id="{{ $student->id }}">Update</a>
             </td>
         </tr>
         @endforeach
 
     </tbody>
+    @else 
+    <div class="alert alert-danger">No Student Found!</div>
+    @endif
 </table>
-{{ $students->links() }}
+{{ $students->appends(request()->query())->links() }}
 </div>
 
 <script>
@@ -52,13 +56,27 @@ const deleteButton = document.querySelectorAll(".delete");
 deleteButton.forEach(del => {
     del.addEventListener("click", function() {
         const id = del.dataset.id;
+
+        Swal.fire({
+        title: "Are you sure? You want to delete it?",
+        showDenyButton: true,
+        confirmButtonText: "Delete",
+        denyButtonText: `Cancel`
+        }).then((result) => {
+        /* Read more about isConfirmed, isDenied below */
+        if (result.isConfirmed) {
+            
         axios.delete(`/student/${id}/delete`)
             .then(res => {
-                window.location = "/"
+                
+                window.location = "/?page={{ request()->page }}";
             })
             .catch(err => {
                 console.log(err)
             })
+        } else if (result.isDenied) {
+        }
+        });
     })
 })
 
@@ -70,7 +88,7 @@ status.forEach(statusButton => {
         axios.put(`/student/${statusButton.dataset.id}/changeStatus`)
             .then(res => {
                 
-                window.location = "/";
+                window.location = "/?page={{ request()->page }}";
 
             })
             .catch(err => {

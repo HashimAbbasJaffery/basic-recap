@@ -6,6 +6,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Course;
+use App\Models\Program;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,6 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory(10)->create();
+        Program::factory(10)->create();
 
         // User::factory()->create([
         //     'name' => 'Test User',
@@ -22,19 +24,23 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         Course::create([
-            "course" => "DSA"
+            "course" => "DSA",
+            "program_id" => 1
         ]);
         
         Course::create([
-            "course" => "Linear Algebra"
+            "course" => "Linear Algebra",
+            "program_id" => 1
         ]);
         
         Course::create([
-            "course" => "Discrete Structure"
+            "course" => "Discrete Structure",
+            "program_id" => 1
         ]);
         
         Course::create([
-            "course" => "Mathematics"
+            "course" => "Mathematics",
+            "program_id" => 1
         ]);
 
     }

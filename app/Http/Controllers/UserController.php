@@ -10,7 +10,7 @@ class UserController extends Controller
 {
     public function index() {
         $keyword = request()->q;
-        $students = User::where("name", "LIKE", "%$keyword%")->where("role", "student")->paginate(15);
+        $students = User::where("name", "LIKE", "%$keyword%")->where("role", "student")->paginate(2);
         return view("Students.index", compact("students"));
     }
 
@@ -39,7 +39,7 @@ class UserController extends Controller
 
         $request->validate([
             "name" => ["required"],
-            "email" => ["required",  "email"],
+            "email" => ["required",  "email", "unique:users,email," . $user->id],
             "password" => "required"
         ]);
         $user->update([...$request->all(), "role" => "student"]);
@@ -48,7 +48,7 @@ class UserController extends Controller
     public function store(Request $request) {
         $request->validate([
             "name" => ["required"],
-            "email" => ["required", "email"],
+            "email" => ["required", "email", "unique:users"],
             "password" => "required"
         ]);
 
